@@ -22,8 +22,9 @@ public class CacheNode {
     private float requestCost = 0.0075f;
     private long requestCount = 0;
     private long requestsToServerCount = 0;
-    private double storageCost = 0;
-    private static final double PRICE_PER_GB_PER_DAY = 0.022 / 30;
+    private double storageHostingCost = 0;
+    private static final double STORAGE_PRICE_PER_GB_PER_DAY = 0.022 / 30;
+    private static final double STORAGE_PRICE_PER_1000_REQUEST = 0.005;
 
     public CacheNode(Region region, int defaultTtl) {
         this.region = region;
@@ -155,6 +156,13 @@ public class CacheNode {
             ttlTable[i] = ttlTable[i+1];
 
         ttlTable[detaultTtl-1] = new ArrayList<>();
+
+        updateStorageHostingCost();
+    }
+
+    private void updateStorageHostingCost() {
+        for (ArrayList<ContentPart> cachedParts : ttlTable)
+            storageHostingCost += cachedParts.size() * ContentPart.DEFAULT_CONTENT_PART_SIZE_IN_GB * STORAGE_PRICE_PER_GB_PER_DAY;
     }
 
     public void increaseRequestCount() {
@@ -165,8 +173,9 @@ public class CacheNode {
         double transferToClientsCost = calculateTransferToCLientsCost();
         double transferFromServerCost = calculateTransferFromServerCost();
         double requestTotalCost = calculateRequestTotalCost();
+        double storageRequestTotalCost = STORAGE_PRICE_PER_1000_REQUEST * requestCount / 1000;
 
-        return requestTotalCost + transferToClientsCost + transferFromServerCost;
+        return requestTotalCost + transferToClientsCost + transferFromServerCost + storageRequestTotalCost + storageHostingCost;
     }
 
     private float calculateRequestTotalCost() {
