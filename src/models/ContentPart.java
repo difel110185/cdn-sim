@@ -13,7 +13,7 @@ public class ContentPart {
     private float cacheHitRatio;
     private ArrayList<CacheNode> distributedCacheNodes;
     private ArrayList<ClientContentPartRequest> requests;
-    public static final float DEFAULT_CONTENT_PART_SIZE_IN_GB = 2 / 1024f;
+    public static final float DEFAULT_CONTENT_PART_SIZE_IN_GB = 10 / 1024f;
 
     public ContentPart(Content content, int sequenceNumber) {
         this.content = content;

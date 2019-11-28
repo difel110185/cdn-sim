@@ -13,7 +13,7 @@ public class Simulation {
     private static final int REGULAR_POPULAR_CONTENT_WEIGHT = 75;
     private static final int OBSOLETE_POPULAR_CONTENT_WEIGHT = 10;
     private static final int MIN_NUMBER_OF_CONTENT_PARTS_TO_REQUEST = 10;
-    private static final int MAX_NUMBER_OF_CONTENT_PARTS_TO_REQUEST = 1000;
+    private static final int MAX_NUMBER_OF_CONTENT_PARTS_TO_REQUEST = 100;
     private static final int VERY_POPULAR_CONTENT_CHANCE_OF_REQUEST_PERCENTAGE = 80;
     private static final int POPULAR_CONTENT_CHANCE_OF_REQUEST_PERCENTAGE = 50;
     private static final int REGULAR_CONTENT_CHANCE_OF_REQUEST_PERCENTAGE = 20;
@@ -68,15 +68,27 @@ public class Simulation {
     }
 
     private void printKpis() {
+        System.out.println("Total cost: $" + String.format("%.2f", getCost()));
+        System.out.println("Number of requests: " + totalNumberOfRequests);
+        System.out.println("Cost per 100000 requests: $" + String.format("%.2f", getCostPer100000Requests()));
+        System.out.println("Cache hit ratio: " + String.format("%.2f%%", getCacheHitRatio()));
+    }
+
+    public double getCostPer100000Requests() {
+        return 100000 * getCost() / totalNumberOfRequests;
+    }
+
+    public float getCacheHitRatio() {
+        return ((float) totalNumberOfRequestsThatHitCache / (float) totalNumberOfRequests) * 100;
+    }
+
+    private double getCost() {
         double cost = 0;
 
         for (CacheNode cacheNode : cacheNodes)
             cost = cacheNode.calculateCost();
 
-        System.out.println("Total cost: $" + String.format("%.2f", cost));
-        System.out.println("Number of requests: " + totalNumberOfRequests);
-        System.out.println("Cost per 100000 requests: $" + String.format("%.2f", 100000 * cost / totalNumberOfRequests));
-        System.out.println("Cache hit ratio: " + String.format("%.2f%%",((float) totalNumberOfRequestsThatHitCache / (float) totalNumberOfRequests) * 100));
+        return cost;
     }
 
     private void runSimulationSteps() {
